@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Always be Building</title>
+    <!-- a modern css reset -->
+    <link
+      rel="stylesheet"
+      href="node_modules/modern-normalize/modern-normalize.css" />
+    <!-- add any fonts here later -->
+    <link rel="preload" href="/fonts/oldenburg-v20-latin-regular.woff2" />
+    <link rel="stylesheet" href="/style.css" />
+    <script type="module" src="/main.js" defer></script>
+  </head>
+  <body>
+    <header id="main-header">
+      <div class="container">
+        <h1>Today</h1>
+        <form action="" id="goal-form">
+          <input
+            type="text"
+            autocomplete="off"
+            name="goal-name"
+            placeholder="What is next?"
+            autofocus />
+          <button type="submit">ADD GOAL</button>
+        </form>
+      </div>
+    </header>
+
+    <section>
+      <div class="container" id="main-content">
+        <ul class="stats">
+          <li>
+            <span>Remaining</span>
+            <span id="remaining-goals">0</span>
+          </li>
+          <li>
+            <span>Completed</span>
+            <span id="completed-goals">0</span>
+          </li>
+          <li>
+            <span>Total</span>
+            <span id="total-goals">0</span>
+          </li>
+        </ul>
+        <ul class="goals"></ul>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <!-- add footer info here later as needed -->
+      </div>
+    </footer>
+  </body>
+</html>
