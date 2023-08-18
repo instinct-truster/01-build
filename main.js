@@ -7,6 +7,7 @@ const totalGoals = document.querySelector("#total-goals");
 const completedGoals = document.querySelector("#completed-goals");
 const remainingGoals = document.querySelector("#remaining-goals");
 const mainInput = document.querySelector("#goal-form input");
+const draggableList = document.getElementById("draggable-list");
 
 let goals = JSON.parse(localStorage.getItem("goals")) || [];
 
@@ -68,6 +69,7 @@ function createGoal(goal) {
   const goalEl = document.createElement("li");
 
   goalEl.setAttribute("id", goal.id);
+  goalEl.setAttribute("draggable", "true");
 
   if (goal.isCompleted) {
     goalEl.classList.add("complete");
@@ -89,6 +91,44 @@ function createGoal(goal) {
   goalList.appendChild(goalEl);
 
   countGoals();
+
+  addEventListeners();
+}
+
+function dragStart() {
+  console.log("Event: ", "dragstart");
+}
+
+function dragEnter() {
+  console.log("Event: ", "dragenter");
+}
+
+function dragLeave() {
+  console.log("Event: ", "dragleave");
+}
+
+function dragOver() {
+  console.log("Event: ", "dragover");
+}
+
+function dragDrop() {
+  console.log("Event: ", "drop");
+}
+
+function addEventListeners() {
+  const draggables = document.querySelectorAll(".draggable");
+  const dragListItems = document.querySelectorAll(".draggable-list li");
+
+  draggables.forEach((draggable) => {
+    draggable.addEventListener("dragstart", dragStart);
+  });
+
+  dragListItems.forEach((item) => {
+    item.addEventListener("dragover", dragOver);
+    item.addEventListener("drop", dragDrop);
+    item.addEventListener("dragenter", dragEnter);
+    item.addEventListener("dragleave", dragLeave);
+  });
 }
 
 function countGoals() {

@@ -11,18 +11,17 @@
     <!-- add any fonts here later -->
     <link rel="preload" href="/fonts/oldenburg-v20-latin-regular.woff2" />
     <link rel="stylesheet" href="/style.css" />
-    <script type="module" src="/main.js" defer></script>
   </head>
   <body>
     <header id="main-header">
       <div class="container">
-        <h1>Today</h1>
-        <form action="" id="goal-form">
+        <h1>Carpe Diem!</h1>
+        <form id="goal-form">
           <input
             type="text"
             autocomplete="off"
             name="goal-name"
-            placeholder="What is next?"
+            placeholder="Plan your next move..."
             autofocus />
           <button type="submit">ADD GOAL</button>
         </form>
@@ -45,7 +44,9 @@
             <span id="total-goals">0</span>
           </li>
         </ul>
-        <ul class="goals"></ul>
+        <ul class="goals" id="draggable-list"></ul>
+
+        <div id="cool"></div>
       </div>
     </section>
 
@@ -54,5 +55,6 @@
         <!-- add footer info here later as needed -->
       </div>
     </footer>
+    <script type="module" src="/main.js"></script>
   </body>
 </html>
