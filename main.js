@@ -7,12 +7,15 @@ const totalGoals = document.querySelector("#total-goals");
 const completedGoals = document.querySelector("#completed-goals");
 const remainingGoals = document.querySelector("#remaining-goals");
 const mainInput = document.querySelector("#goal-form input");
-const draggableList = document.getElementById("draggable-list");
+const undoButton = document.getElementById("undo-button");
+const goalListEl = document.getElementById("goal-list");
+
+let lastGoalList = null;
 
 let goals = JSON.parse(localStorage.getItem("goals")) || [];
 
 if (localStorage.getItem("goals")) {
-  goals.map(createGoal);
+  drawGoalList(goals, goalListEl);
 }
 
 goalForm.addEventListener("submit", (e) => {
@@ -33,7 +36,7 @@ goalForm.addEventListener("submit", (e) => {
   goals.push(goal);
   localStorage.setItem("goals", JSON.stringify(goals));
 
-  createGoal(goal);
+  drawGoalList(goals, goalListEl);
 
   goalForm.reset();
   mainInput.focus();
@@ -47,6 +50,8 @@ goalList.addEventListener("click", (e) => {
   ) {
     const goalId = e.target.closest("li").id;
 
+    lastGoalList = goals.slice();
+
     removeGoal(goalId);
   }
 });
@@ -57,12 +62,6 @@ goalList.addEventListener("keydown", (e) => {
 
     e.target.blur();
   }
-});
-
-goalList.addEventListener("input", (e) => {
-  const goalId = e.target.closest("li").id;
-
-  updateGoal(goalId, e.target);
 });
 
 function createGoal(goal) {
@@ -77,66 +76,38 @@ function createGoal(goal) {
 
   const goalElMarkup = `
   <div>
-  <input type="checkbox" name="goals" id="${goal.id}" ${
+    <input type="checkbox" name="goals" id="${goal.id}" ${
     goal.isCompleted ? "checked" : ""
   }>
-  <span ${!goal.isCompleted ? "contenteditable" : ""}>${goal.name}</span>
+    <span ${!goal.isCompleted ? "contenteditable" : ""}>${goal.name}</span>
   </div>
-    <button title="Remove the "${goal.name}" goal" class="remove-goal">
-    ${bibleIconString}
-    </button>
+  <button title='Remove the "${goal.name}" goal' class="remove-goal">
+  ${bibleIconString}
+  </button>
   `;
   goalEl.innerHTML = goalElMarkup;
-
-  goalList.appendChild(goalEl);
-
-  countGoals();
-
-  addEventListeners();
+  return goalEl;
 }
 
-function dragStart() {
-  console.log("Event: ", "dragstart");
+function countGoals(list, type = "ALL") {
+  switch (type) {
+    case "ALL":
+      return list.length;
+    case "COMPLETE":
+      return list.filter((goal) => goal.isCompleted).length;
+    case "INCOMPLETE":
+      return list.filter((goal) => !goal.isCompleted).length;
+  }
 }
 
-function dragEnter() {
-  console.log("Event: ", "dragenter");
-}
+function updateGoalCount() {
+  const totalCount = goals.length;
+  const completedCount = countGoals(goals, "COMPLETE");
+  const remainingCount = totalCount - completedCount;
 
-function dragLeave() {
-  console.log("Event: ", "dragleave");
-}
-
-function dragOver() {
-  console.log("Event: ", "dragover");
-}
-
-function dragDrop() {
-  console.log("Event: ", "drop");
-}
-
-function addEventListeners() {
-  const draggables = document.querySelectorAll(".draggable");
-  const dragListItems = document.querySelectorAll(".draggable-list li");
-
-  draggables.forEach((draggable) => {
-    draggable.addEventListener("dragstart", dragStart);
-  });
-
-  dragListItems.forEach((item) => {
-    item.addEventListener("dragover", dragOver);
-    item.addEventListener("drop", dragDrop);
-    item.addEventListener("dragenter", dragEnter);
-    item.addEventListener("dragleave", dragLeave);
-  });
-}
-
-function countGoals() {
-  const completedGoalsArray = goals.filter((goal) => goal.isCompleted === true);
-
-  totalGoals.textContent = goals.length;
-  completedGoals.textContent = completedGoalsArray.length;
-  remainingGoals.textContent = goals.length - completedGoalsArray.length;
+  totalGoals.textContent = totalCount;
+  completedGoals.textContent = completedCount;
+  remainingGoals.textContent = remainingCount;
 }
 
 function removeGoal(goalId) {
@@ -146,32 +117,31 @@ function removeGoal(goalId) {
 
   document.getElementById(goalId).remove();
 
-  countGoals();
+  updateGoalCount();
 }
 
-function updateGoal(goalId, el) {
-  const goal = goals.find((goal) => goal.id === parseInt(goalId));
+function drawGoalList(goals, node) {
+  node.replaceChildren(...goals.map(createGoal));
+  updateGoalCount();
+  updateUndoButton();
+}
 
-  if (el.hasAttribute("contenteditable")) {
-    goal.name = el.textContent;
-  } else {
-    const span = el.nextElementSibling;
-    const parent = el.closest("li");
-
-    goal.isCompleted = !goal.isCompleted;
-
-    if (goal.isCompleted) {
-      span.removeAttribute("contenteditable");
-      parent.classList.add("complete");
-    } else {
-      span.setAttribute("contenteditable", "true");
-      parent.classList.remove("complete");
-    }
+undoButton.addEventListener("click", () => {
+  if (lastGoalList === null) {
+    return;
   }
-
+  goals = lastGoalList;
+  lastGoalList = null;
   localStorage.setItem("goals", JSON.stringify(goals));
+  drawGoalList(goals, goalListEl);
+});
 
-  countGoals();
+function updateUndoButton() {
+  if (lastGoalList === null) {
+    undoButton.disabled = true;
+  } else {
+    undoButton.disabled = false;
+  }
 }
 
 function insertBibleIcons() {
